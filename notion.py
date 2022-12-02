@@ -55,6 +55,15 @@ class NotionClient:
         return data
 
 
+    def get_children_blocks(self): 
+        pass
+
+    
+    def clean_children_blocks(self):
+        pass
+
+
+
     def cast_block(self, cast):
         block = {
             "object": "block",

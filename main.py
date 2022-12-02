@@ -2,6 +2,7 @@ from peliculas import Film
 from notion import NotionClient
 import os
 from dotenv import load_dotenv
+from csv import DictReader
 
 load_dotenv()
 
@@ -42,7 +43,7 @@ def extract_films_list(client):
             dic['year'] = None
         try:
             dic['tmdb_id'] = film['properties']['TMDB_id']['rich_text'][0]['text']['content']
-        except KeyError:
+        except IndexError:
             dic['tmdb_id'] = None
         films.append(dic)
         
@@ -69,21 +70,23 @@ def update_filmpage(client, tmdb_key, film_dic, region, language):
     
    
 
+if __name__ == '__main__':
+    client = NotionClient(notion_token, databaseId)
+    with open("films_info.csv", 'r') as f:
+     
+        dict_reader = DictReader(f)
+        
+        films_info = list(dict_reader)
+    
+    # print(films_info)
 
-client = NotionClient(notion_token, databaseId)
+    # films_info = extract_films_list(client)
 
-films_info = extract_films_list(client)
-print(films_info)
-# with open("peliculas.csv", "w"):
-#     for 
-
-if len(films_info) > 0:
-    for film_dic in films_info:
-        print(film_dic)
-        res = update_filmpage(client, tmdb_key, film_dic, region, language)
-        print(res)
-        break
-        res = update_filmpage(client, dic)
-        print('\n')
-else:
-    print('No hay películas por actualizar')
+    if len(films_info) > 0:
+        for film_dic in films_info:
+            print(film_dic)
+            res = update_filmpage(client, tmdb_key, film_dic, region, language)
+            print(res)
+            print('\n')
+    else:
+        print('No hay películas por actualizar')

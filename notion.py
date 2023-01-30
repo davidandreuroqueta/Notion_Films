@@ -231,7 +231,8 @@ class NotionClient:
         res = requests.patch(url, json = data, headers=self.headers)
         return res
 
-    # def create_page(self, film):
+    # not used
+    def create_page(self, film):
         create_url = 'https://api.notion.com/v1/pages'
 
         genero = [{"name": tag} for tag in film.genres]

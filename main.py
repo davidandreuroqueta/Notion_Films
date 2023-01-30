@@ -1,9 +1,6 @@
 from peliculas import Film
 from notion import NotionClient
-import os
 import json
-from dotenv import load_dotenv
-from csv import DictReader
 
 # def new_filmpage(client, name):
     # film = Film(name)
@@ -25,8 +22,6 @@ def set_settings(name, value):
     
 def ask_for(ini_quest, expl, instance, l = []):
     res = None
-    print(l)
-    print(len(l)==0, res in l)
     while not (len(l) == 0 or res in l):
         try:
             res = instance(input(ini_quest))
@@ -46,6 +41,7 @@ def first_page(notion_token, databaseId, tmdb_key, language, region):
 
     if first.lower() in ('y', 'yes'):
         return second_page(notion_token, databaseId, tmdb_key, language, region)
+
     
 def second_page(notion_token, databaseId, tmdb_key, language, region):
     print('The current options are: ' + '\n' + '\n' +
@@ -53,7 +49,7 @@ def second_page(notion_token, databaseId, tmdb_key, language, region):
         'Notion database ID: ' + databaseId + '\n' +
         'TMDB key: ' + tmdb_key + '\n' +
         'Language (ISO 639-1): ' + language + '\n' +
-        'Region (Look for it in the TMDB doc): ' + region + '\n'+ '\n'+ '\n')
+        'Region (Look for it in the TMDB doc): ' + region + '\n'+ '\n')
     
     print('Change:' + '\n' +
             '1) Notion token' + '\n' +
@@ -61,10 +57,9 @@ def second_page(notion_token, databaseId, tmdb_key, language, region):
             '3) TMDB key' + '\n' +
             '4) Language' + '\n' +
             '5) Region' + '\n' +
-            '6) GO BACK')
+            '6) GO BACK' + '\n')
     
     dic_options = {k+1: v for k, v in enumerate(['notion_token', 'databaseId', 'tmdb_key', 'language', 'region'])}
-    print(dic_options)
     
     option = ask_for('Choose an option: ', 'Option not valid. Must be a number between 1-6', int, [1,2,3,4,5,6])
     if option == 6:
@@ -76,8 +71,7 @@ def second_page(notion_token, databaseId, tmdb_key, language, region):
     else:
         second_page(notion_token, databaseId, tmdb_key, language, region)
     
-    
-    
+
 
 def extract_films_list(client):
     db = client.read_database()
@@ -125,44 +119,24 @@ def update_filmpage(client, tmdb_key, film_dic, region, language):
    
 
 if __name__ == '__main__':
-    load_dotenv()
 
     # Read settings from json
     notion_token, databaseId, tmdb_key, language, region = get_settings()
-
-    notion_token = os.getenv('NOTION_TOKEN')
-    tmdb_key = os.getenv('TMDB_TOKEN')
-    language = 'es-ES' #ISO 639-1
-    region = 'ES' #https://developers.themoviedb.org/3/movies/get-movie-watch-providers
-    databaseId = os.getenv('DATABASEID')
-
-    headers = {
-        "Accept": "application/json",
-        "Notion-Version": "2022-02-22",
-        "Authorization": f"Bearer {notion_token}"
-    }
     
     first_page(notion_token, databaseId, tmdb_key, language, region)
-
-        
     
-    
-    # client = NotionClient(notion_token, databaseId)
-    # with open("films_info.csv", 'r') as f:
-     
-    #     dict_reader = DictReader(f)
-        
-    #     films_info = list(dict_reader)
-    
-    # # print(films_info)
+    client = NotionClient(notion_token, databaseId)
 
-    # # films_info = extract_films_list(client)
+    films_info = extract_films_list(client)
 
-    # if len(films_info) > 0:
-    #     for film_dic in films_info:
-    #         print(film_dic)
-    #         res = update_filmpage(client, tmdb_key, film_dic, region, language)
-    #         print(res)
-    #         print('\n')
-    # else:
-    #     print('No hay películas por actualizar')
+    if len(films_info) > 0:
+        for film_dic in films_info:
+            print(film_dic)
+            try: 
+                res = update_filmpage(client, tmdb_key, film_dic, region, language)
+                print(res)
+            except: 
+                print('There is a problem with this film')
+            print('\n')
+    else:
+        print('There is no films to update')

@@ -21,7 +21,7 @@ To run the program besides python you need:
 
 - Watchmode token: request your API token in https://api.watchmode.com/
 
-**Finally insert the Notion token, Watchmode token and database ID in the main.py code.**
+**Finally insert the Notion token, Watchmode token, database ID, language and region in settings.json code.**
 
 ## How to use the program
 1. You have to insert a new line for each film you want in the database with its name (english) and realese year (optional but recommendable)
